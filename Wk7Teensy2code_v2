@@ -1,0 +1,76 @@
+#include "DHT.h"
+//#include <SoftwareSerial.h>
+
+#define RED 9
+#define GREEN 1
+#define YELLOW 6
+
+// Teensy 5V <--> HC-05 Vcc
+// Teensy Ground <--> HC-05 GND
+#define rxPin 7 // Teensy pin 7 <--> HC-05 Tx
+#define txPin 8 // Teensy pin 8 <--> HC-05 Rx
+//SoftwareSerial BTSerial =  SoftwareSerial(rxPin, txPin);
+
+void setup() {
+  // Setup serial for monitor
+  Serial.begin(9600); 
+
+  // Setup Serial1 for BlueTooth
+  Serial1.begin(9600); // Default communication rate of the Bluetooth module
+
+  //Setup Lights
+  pinMode(RED, OUTPUT);
+  pinMode(YELLOW, OUTPUT);
+  pinMode(GREEN, OUTPUT);
+
+  digitalWrite(YELLOW,LOW);
+  digitalWrite(RED,LOW);
+  digitalWrite(GREEN,LOW);
+  
+}
+
+void loop() {
+   if(Serial1.available() > 0) {// Checks whether data is comming from the serial port
+    String status = String(Serial1.readStringUntil('\r\n'));
+    Serial.println(status);
+    //Serial.print(status.indexOf("lightHigh2")); //testing only
+    //String status = "lightHigh\r\n"; 
+
+    //if(status == "lightHigh")
+    if (status.indexOf("lightHigh") >= 0)
+    {
+      //Serial.println("detected light high");
+      digitalWrite(YELLOW,HIGH);
+    }
+    else if(status.indexOf("lightLow") >= 0)
+    { 
+      //Serial.println("detected light low");
+      digitalWrite(YELLOW,LOW);
+    }
+       
+    else if (status.indexOf("tempHigh") >=0||status.indexOf("humidHigh") >=0)
+    {
+      //Serial.println("detected temp or humid high");
+      digitalWrite(RED,HIGH);
+    }
+    else if (status.indexOf("tempLow")>=0||status.indexOf("humidLow")>=0)
+    {
+      //Serial.println("detected temp or humid low");
+      digitalWrite(RED,LOW);
+    }
+         
+    else if (status.indexOf("soilHigh") >=0 )
+    {
+      //Serial.println("detected soil high");
+      digitalWrite(GREEN,HIGH);
+    }
+    else if (status.indexOf("soilLow")>=0)
+    {
+      //Serial.println("detected soil low");
+      digitalWrite(GREEN,LOW);
+    }
+ 
+    }
+   
+   
+ }
